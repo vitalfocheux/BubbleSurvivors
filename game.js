@@ -213,4 +213,20 @@ function initializeGame() {
 }
 
 // Start the game when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initializeGame);
+document.addEventListener('DOMContentLoaded', (event) => {
+    initializeGame();
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    // Initial resize
+    resizeCanvas();
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', resizeCanvas);
+});
