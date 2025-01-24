@@ -14,7 +14,10 @@ class BubbleSurvivorsGame {
         this.score = 0;
         this.difficulty = 1;
         this.initGame();
-        this.wave = 1;
+        this.waveNumber = 1;
+        this.time = this.waveNumber * 10;
+
+        setInterval(() => this.updateTime(), 1000);
     }
 
     initGame() {
@@ -61,11 +64,23 @@ class BubbleSurvivorsGame {
         });
     }
 
+    updateTime(){
+        this.time--;
+        if(this.time === 0){
+            this.waveNumber++;
+            this.time = this.waveNumber * 10;
+            this.difficulty++;
+        }
+    }
+
+    
+
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.player.render(this.ctx);
         this.renderProjectiles();
         this.renderEnemies();
+        this.renderWaveNumber();
     }
 
     renderProjectiles() {
@@ -74,6 +89,14 @@ class BubbleSurvivorsGame {
 
     renderEnemies() {
         this.enemies.forEach(enemy => enemy.render(this.ctx));
+    }
+
+    renderWaveNumber() {
+        this.ctx.font = '20px Arial';
+        this.ctx.fillStyle = 'black';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`Vague ${this.waveNumber}`, this.canvas.width / 2, 40);
+        this.ctx.fillText(`Temps restant: ${this.time}`, this.canvas.width / 2, 70);
     }
 
     spawnEnemies() {
