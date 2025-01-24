@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', (e) => {
     document.getElementById('startGame').addEventListener('click', function() {
-        alert('Le jeu commence bientôt ! Préparez-vous à survivre !');
-        // Ici, vous ajouteriez la logique de démarrage du jeu
+        window.location.href = 'game.html';
     });
 
     // Effet de scintillement du titre
