@@ -13,8 +13,11 @@ class BubbleSurvivorsGame {
         this.projectiles = [];
         this.score = 0;
         this.difficulty = 1;
-        
         this.initGame();
+        this.waveNumber = 1;
+        this.time = this.waveNumber * 10;
+
+        setInterval(() => this.updateTime(), 1000);
     }
 
     initGame() {
@@ -61,11 +64,23 @@ class BubbleSurvivorsGame {
         });
     }
 
+    updateTime(){
+        this.time--;
+        if(this.time === 0){
+            this.waveNumber++;
+            this.time = this.waveNumber * 10;
+            this.difficulty++;
+        }
+    }
+
+    
+
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.player.render(this.ctx);
         this.renderProjectiles();
         this.renderEnemies();
+        this.renderWaveNumber();
     }
 
     renderProjectiles() {
@@ -74,6 +89,14 @@ class BubbleSurvivorsGame {
 
     renderEnemies() {
         this.enemies.forEach(enemy => enemy.render(this.ctx));
+    }
+
+    renderWaveNumber() {
+        this.ctx.font = '20px Arial';
+        this.ctx.fillStyle = 'black';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`Vague ${this.waveNumber}`, this.canvas.width / 2, 40);
+        this.ctx.fillText(`Temps restant: ${this.time}`, this.canvas.width / 2, 70);
     }
 
     spawnEnemies() {
@@ -108,12 +131,18 @@ class BubbleSurvivorsGame {
 }
 
 class PlayerBubble {
+
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.radius = 20;
+        this.radius = 30;
         this.speed = 5;
-        this.projectileCooldown = 0;
+        this.opacity = 0.7 + Math.random() * 0.3;
+        this.wobble = {
+            x: Math.random() * Math.PI * 2,
+            amplitude: Math.random() * 2,
+            frequency: 0.05 + Math.random() * 0.1
+        };
     }
 
     update(canvas) {
@@ -129,10 +158,59 @@ class PlayerBubble {
     }
 
     render(ctx) {
+
+        ctx.save(); // Sauvegarder le contexte du canvas
+    
+        // Création du chemin de base de la bulle
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'blue';
+    
+        // Gradient radial plus complexe
+        const gradient = ctx.createRadialGradient(
+            this.x - this.radius * 0.2, 
+            this.y - this.radius * 0.2, 
+            0, 
+            this.x, 
+            this.y, 
+            this.radius
+        );
+        gradient.addColorStop(0, `rgba(255,255,255,${this.opacity})`);
+        gradient.addColorStop(0.7, `rgba(74,144,226,${this.opacity * 0.5})`);
+        gradient.addColorStop(1, `rgba(74,144,226,${this.opacity * 0.2})`);
+    
+        // Application du style de remplissage
+        ctx.fillStyle = gradient;
         ctx.fill();
+    
+        // Reflets lumineux
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        
+        // Petit reflet
+        ctx.arc(
+            this.x - this.radius * 0.3, 
+            this.y - this.radius * 0.3, 
+            this.radius * 0.1, 
+            0, 
+            Math.PI * 2
+        );
+        ctx.fill();
+    
+        // Contour avec effet de membrane
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(200,230,255,${this.opacity * 0.7})`;
+        ctx.lineWidth = this.radius * 0.05;
+        ctx.stroke();
+    
+        // Effet de profondeur avec une légère ombre
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.95, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0,0,0,${this.opacity * 0.1})`;
+        ctx.lineWidth = this.radius * 0.1;
+        ctx.stroke();
+    
+        ctx.restore(); // Restaurer le contexte du canvas
     }
 
     shootProjectile() {
@@ -213,4 +291,20 @@ function initializeGame() {
 }
 
 // Start the game when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initializeGame);
+document.addEventListener('DOMContentLoaded', (event) => {
+    initializeGame();
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    // Initial resize
+    resizeCanvas();
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', resizeCanvas);
+});
