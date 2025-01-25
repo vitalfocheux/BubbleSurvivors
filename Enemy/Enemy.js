@@ -11,6 +11,7 @@ export class Enemy{
         this.exp = exp;
         this.damage = damage;
         this.life = life;
+        this.shiny = Math.floor(Math.random() * 8192) === 0;
     }
 
     update(playerX, playerY) {
@@ -31,5 +32,25 @@ export class Enemy{
 
     getLife() {
         return this.life;
+    }
+
+    getShiny() {
+        return this.shiny;
+    }
+
+    setDamage(damage) {
+        this.damage = damage;
+    }
+
+    setLife(life) {
+        this.life = life;
+    }
+
+    setSpeed(speed) {
+        this.speed = speed;
+    }
+
+    setExp(exp) {
+        this.exp = exp;
     }
 }
