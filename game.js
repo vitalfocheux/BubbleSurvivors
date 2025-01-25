@@ -2,6 +2,7 @@ import { Enemy } from './Enemy/Enemy.js';
 import { Blob_Fish } from './Enemy/Blob_Fish.js';
 import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
+import { Duck } from './Enemy/Duck.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -10,6 +11,7 @@ const FPS = 60;
 
 const TIME_MUL = 5;
 const HEALTH_BASE = 100;
+const WAVE = 1;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -228,6 +230,10 @@ class BubbleSurvivorsGame {
                         case 'Axolotl':
                             enemy = new Axolotl(this.canvas);
                             this.enemyCooldown = 150;
+                            break;
+                        case 'Duck':
+                            enemy = new Duck(this.canvas);
+                            this.enemyCooldown = 160;
                             break;
                         default:
                             continue;
@@ -493,7 +499,7 @@ document.addEventListener('keyup', (e) => keys[e.code] = false);
 let game;
 function initializeGame() {
     const canvas = document.getElementById('gameCanvas');
-    game = new BubbleSurvivorsGame(canvas, 7, 0, 1);
+    game = new BubbleSurvivorsGame(canvas, WAVE, 0, 1);
 
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') game.player.shootProjectile();
