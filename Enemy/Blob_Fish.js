@@ -5,7 +5,7 @@ export class Blob_Fish extends Enemy {
         super(canvas, 15, 2);
         this.images = [];
         this.imageDeath = new Image();
-        this.imageDeath.src = '../assets/sprites/blob_fish/blob_fish_death.png';
+        this.imageDeath.src = 'assets/sprites/blob_fish/blob_fish_death.png';
         this.loadBlobFishSprite();
         this.frameIndex = 0; // Index of the current frame
         this.frameWidth = 64; // Width of each frame
@@ -18,7 +18,7 @@ export class Blob_Fish extends Enemy {
         const numFrames = 9;
         for (let i = 1; i < numFrames; i++) {
             const img = new Image();
-            img.src = `../assets/sprites/blob_fish/blob_fish_${i}.png`;
+            img.src = `assets/sprites/blob_fish/blob_fish_${i}.png`;
             img.onerror = () => {
                 console.error(`Failed to load image: ${img.src}`);
             };
