@@ -1,4 +1,5 @@
-import { Enemy } from './Enemy.js';
+import { Enemy } from './Enemy/Enemy.js';
+import { Blob_Fish } from './Enemy/Blob_Fish.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -145,6 +146,8 @@ class PlayerBubble {
             amplitude: Math.random() * 2,
             frequency: 0.05 + Math.random() * 0.1
         };
+        this.healthMax = 100;
+        this.health = this.healthMax;
     }
 
     update(canvas) {
@@ -211,8 +214,33 @@ class PlayerBubble {
         ctx.strokeStyle = `rgba(0,0,0,${this.opacity * 0.1})`;
         ctx.lineWidth = this.radius * 0.1;
         ctx.stroke();
+
+        this.renderHealthBar(ctx);
     
         ctx.restore(); // Restaurer le contexte du canvas
+    }
+
+    renderHealthBar(ctx) {
+        const barWidth = 100;
+        const barHeight = 20;
+        const barX = 10; // Position X en haut à gauche
+        const barY = 10; // Position Y en haut à gauche
+
+        // Dessiner la barre de fond (grise)
+        ctx.fillStyle = 'grey';
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+
+        // Dessiner la barre de vie (rouge)
+        const healthWidth = (this.health / 100) * barWidth;
+        ctx.fillStyle = 'red';
+        ctx.fillRect(barX, barY, healthWidth, barHeight);
+
+        // Dessiner le texte de la vie
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${this.health} / ${this.healthMax} HP`, barX + barWidth / 2, barY + barHeight / 2);
     }
 
     shootProjectile() {
@@ -250,80 +278,6 @@ class Projectile {
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'red';
         ctx.fill();
-    }
-}
-
-class Blob_Fish extends Enemy {
-    constructor(canvas){
-        super(canvas, 15, 2);
-        this.images = [];
-        this.imageDeath = new Image();
-        this.imageDeath.src = 'images/blob_fish_death.png';
-        this.loadBlobFishSprite();
-        this.frameIndex = 0; // Index of the current frame
-        this.frameWidth = 64; // Width of each frame
-        this.frameHeight = 64; // Height of each frame
-        this.frameCounter = 0; // Counter to control frame rate
-        this.framesPerSprite = 10; // Number of game frames per sprite frame
-    }
-
-    loadBlobFishSprite() {
-        const numFrames = 8;
-        for (let i = 1; i < numFrames; i++) {
-            const img = new Image();
-            img.src = `images/blob_fish_${i}.png`;
-            img.onerror = () => {
-                console.error(`Failed to load image: ${img.src}`);
-            };
-            this.images.push(img);
-        }
-    }
-
-    update(playerX, playerY) {
-        const angle = Math.atan2(playerY - this.y, playerX - this.x);
-        this.x += Math.cos(angle) * this.speed;
-        this.y += Math.sin(angle) * this.speed;
-
-        // Update frame index for animation
-        this.frameCounter++;
-        if (this.frameCounter >= this.framesPerSprite) {
-            this.frameCounter = 0;
-            this.frameIndex = (this.frameIndex + 1) % this.images.length;
-        }
-    }
-
-    render(ctx) {
-        const image = this.images[this.frameIndex];
-        if (image.complete && image.naturalWidth !== 0) {
-            // Define the source rectangle (sx, sy, sWidth, sHeight)
-            const sx = 0;
-            const sy = 0;
-            const sWidth = this.frameWidth;
-            const sHeight = this.frameHeight;
-
-            // Define the destination rectangle (dx, dy, dWidth, dHeight)
-            const dx = this.x - this.radius;
-            const dy = this.y - this.radius;
-            const scaleFactor = 2; // Scale factor to enlarge the image
-            const dWidth = this.radius * 2 * scaleFactor;
-            const dHeight = this.radius * 2 * scaleFactor;
-
-            ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-        } else {
-            image.onload = () => {
-                const sx = 0;
-                const sy = 0;
-                const sWidth = this.frameWidth;
-                const sHeight = this.frameHeight;
-                const dx = this.x - this.radius;
-                const dy = this.y - this.radius;
-                const scaleFactor = 2; // Scale factor to enlarge the image
-                const dWidth = this.radius * 2 * scaleFactor;
-                const dHeight = this.radius * 2 * scaleFactor;
-
-                ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-            };
-        }
     }
 }
 
