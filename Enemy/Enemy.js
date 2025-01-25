@@ -1,5 +1,5 @@
 export class Enemy{
-    constructor(canvas, radius, speed) {
+    constructor(canvas, radius, speed, exp, damage, life) {
         if(new.target === Enemy){
             throw new TypeError("Cannot construct Enemy instances directly");
         }
@@ -8,7 +8,9 @@ export class Enemy{
         this.speed = speed;
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.exp = 0;
+        this.exp = exp;
+        this.damage = damage;
+        this.life = life;
     }
 
     update(playerX, playerY) {
@@ -21,5 +23,13 @@ export class Enemy{
 
     getExp() {
         return this.exp;
+    }
+
+    getDamage() {
+        return this.damage;
+    }
+
+    getLife() {
+        return this.life;
     }
 }

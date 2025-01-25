@@ -2,7 +2,7 @@ import { Enemy } from './Enemy.js';
 
 export class Blob_Fish extends Enemy {
     constructor(canvas){
-        super(canvas, 15, 2);
+        super(canvas, 15, 2, 1, 1, 3);
         this.images = [];
         this.imageDeath = new Image();
         this.imageDeath.src = 'assets/sprites/blob_fish/blob_fish_death.png';
@@ -12,7 +12,6 @@ export class Blob_Fish extends Enemy {
         this.frameHeight = 64; // Height of each frame
         this.frameCounter = 0; // Counter to control frame rate
         this.framesPerSprite = 10; // Number of game frames per sprite frame
-        this.exp = 1;
     }
 
     loadBlobFishSprite() {
@@ -72,9 +71,5 @@ export class Blob_Fish extends Enemy {
                 ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             };
         }
-    }
-
-    getExp() {
-        return this.exp;
     }
 }
