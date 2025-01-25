@@ -1,0 +1,47 @@
+{
+    "enemies": [
+        {
+            "name": "Squid",
+            "wave": 4,
+            "attributes": {
+                "speed": 1.5,
+                "exp": 3,
+                "damage": 2,
+                "life": 5
+            },
+            "spawnRate": {
+                "4-6": 0.5,
+                "7-10": 0.7
+            }
+        },
+        {
+            "name": "Blob_Fish",
+            "wave": 1,
+            "attributes": {
+                "speed": 1,
+                "damage": 1,
+                "life": 3,
+                "exp": 1
+            },
+            "spawnRate": {
+                "1-3": 1,
+                "4-6": 0.5,
+                "7-10": 0.1
+            }
+        },
+        {
+            "name": "Axolotl",
+            "wave": 7,
+            "attributes": {
+                "speed": 3,
+                "exp": 7,
+                "damage": 2.5,
+                "life": 7
+            },
+            "spawnRate": {
+                "7-10": 1,
+                "11-13": 0.5
+            }
+        }
+    ]
+}

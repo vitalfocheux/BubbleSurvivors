@@ -1,5 +1,7 @@
 import { Enemy } from './Enemy/Enemy.js';
 import { Blob_Fish } from './Enemy/Blob_Fish.js';
+import { Squid } from './Enemy/Squid.js';
+import { Axolotl } from './Enemy/Axolotl.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -25,8 +27,15 @@ class BubbleSurvivorsGame {
         this.isGameRunning = true;
         this.levelCurrent = 1;
         this.levelBeforeWave = 1;
+        this.loadEnemiesConfig();
+        this.enemyCooldown = 0;
 
         setInterval(() => this.updateTime(), 1000);
+    }
+
+    async loadEnemiesConfig() {
+        const response = await fetch('Enemies.json');
+        this.enemiesConfig = await response.json();
     }
 
     initGame() {
@@ -100,6 +109,7 @@ class BubbleSurvivorsGame {
             // Remove enemies out of bounds
             if (this.isOutOfBounds(enemy) || enemy.getLife() <= 0) {
                 this.enemies.splice(index, 1);
+                this.updateExp_Money(enemy);
             }
         });
     }
@@ -115,18 +125,29 @@ class BubbleSurvivorsGame {
         });
     }
 
+    updateExp_Money(enemy){
+        this.player.expNow += enemy.getExp();
+        if(this.player.expNow >= this.player.expMax){
+            this.levelCurrent++;
+            this.player.expNow = 0;
+            this.player.expMax += 50;
+        }
+        this.player.money += enemy.getExp();
+    }
+
     updateTime(){
         this.time--;
         if(this.time === 0){
 
             for(let enemy of this.enemies){
-                this.player.expNow += enemy.getExp();
-                if(this.player.expNow >= this.player.expMax){
-                    this.levelCurrent++;
-                    this.player.expNow = 0;
-                    this.player.expMax += 50;
-                }
-                this.player.money += enemy.getExp();
+                // this.player.expNow += enemy.getExp();
+                // if(this.player.expNow >= this.player.expMax){
+                //     this.levelCurrent++;
+                //     this.player.expNow = 0;
+                //     this.player.expMax += 50;
+                // }
+                // this.player.money += enemy.getExp();
+                this.updateExp_Money(enemy);
             }
 
             this.enemies = [];
@@ -134,8 +155,6 @@ class BubbleSurvivorsGame {
             this.waveNumber++;
             this.difficulty++;
             this.player.health = this.player.healthMax;
-            
-            console.log(this.waveNumber);
 
             // Open the modal
             const modal = document.getElementById('modal');
@@ -185,10 +204,48 @@ class BubbleSurvivorsGame {
     }
 
     spawnEnemies() {
-        if (Math.random() < 0.02 * this.difficulty) {
-            const enemy = new Blob_Fish(this.canvas, 15, 2);
-            this.enemies.push(enemy);
+        if (!this.enemiesConfig) return;
+    
+        if(this.enemyCooldown > 0){
+            this.enemyCooldown--;
+            return;
         }
+        
+        for (const enemyConfig of this.enemiesConfig.enemies) {
+            if (this.waveNumber >= enemyConfig.wave) {
+                const spawnRate = this.getSpawnRateForWave(enemyConfig.spawnRate);
+                if (Math.random() < spawnRate) {
+                    let enemy;
+                    switch (enemyConfig.name) {
+                        case 'Blob_Fish':
+                            enemy = new Blob_Fish(this.canvas);
+                            this.enemyCooldown = 50;
+                            break;
+                        case 'Squid':
+                            enemy = new Squid(this.canvas);
+                            this.enemyCooldown = 100;
+                            break;
+                        case 'Axolotl':
+                            enemy = new Axolotl(this.canvas);
+                            this.enemyCooldown = 150;
+                            break;
+                        default:
+                            continue;
+                    }
+                    this.enemies.push(enemy);
+                }
+            }
+        }
+    }
+
+    getSpawnRateForWave(spawnRateConfig) {
+        for (const [waveRange, rate] of Object.entries(spawnRateConfig)) {
+            const [startWave, endWave] = waveRange.split('-').map(Number);
+            if (this.waveNumber >= startWave && this.waveNumber <= endWave) {
+                return rate;
+            }
+        }
+        return 0;
     }
 
     checkCollisions() {
@@ -436,11 +493,16 @@ document.addEventListener('keyup', (e) => keys[e.code] = false);
 let game;
 function initializeGame() {
     const canvas = document.getElementById('gameCanvas');
-    game = new BubbleSurvivorsGame(canvas, 1, 0, 1);
+    game = new BubbleSurvivorsGame(canvas, 7, 0, 1);
 
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') game.player.shootProjectile();
     });
+}
+
+function sleep(ms){
+    const start = new Date().getTime();
+    while(new Date().getTime() < start + ms);
 }
 
 // Start the game when the DOM is fully loaded
