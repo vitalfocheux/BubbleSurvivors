@@ -7,6 +7,7 @@ const CANVAS_HEIGHT = 600;
 const FPS = 60;
 
 const TIME_MUL = 5;
+const HEALTH_BASE = 100;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -47,6 +48,33 @@ class BubbleSurvivorsGame {
     }
 
     update() {
+        // if (!this.isGameRunning) return; // Stop updating if the game is not running
+
+        // Check if player's health is 0 and time is greater than 0
+        if (this.player.health <= 0 && this.time > 0) {
+            this.isGameRunning = false;
+
+            // Open the game over modal
+            const gameOverModal = document.getElementById('gameOverModal');
+            gameOverModal.style.display = 'block';
+
+            // Handle game restart
+            const restartGameButton = document.getElementById('restartGame');
+            restartGameButton.onclick = () => {
+                gameOverModal.style.display = 'none';
+                this.isGameRunning = true;
+
+                this.waveNumber = 1;
+                this.player.health = HEALTH_BASE;
+                // Reset or reinitialize game state for new wave
+                this.enemies = [];  // Clear existing enemies
+                this.projectiles = [];  // Clear existing projectiles
+                this.time = this.waveNumber * TIME_MUL;  // Reset timer based on wave number
+            }
+            return;
+        }
+
+
         this.player.update(this.canvas);
         this.updateProjectiles();
         this.updateEnemies();
@@ -175,7 +203,7 @@ class PlayerBubble {
             amplitude: Math.random() * 2,
             frequency: 0.05 + Math.random() * 0.1
         };
-        this.healthMax = 100;
+        this.healthMax = HEALTH_BASE;
         this.health = this.healthMax;
         this.expNow = 0;
         this.expMax = 100;
