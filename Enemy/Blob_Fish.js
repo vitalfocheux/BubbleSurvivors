@@ -2,7 +2,7 @@ import { Enemy } from './Enemy.js';
 
 export class Blob_Fish extends Enemy {
     constructor(canvas){
-        super(canvas, 15, 2, 1, 1, 3);
+        super(canvas, 15, 1, 1, 1, 3);
         this.images = [];
         this.imageDeath = new Image();
         this.imageDeath.src = 'assets/sprites/blob_fish/blob_fish_death.png';
