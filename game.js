@@ -142,14 +142,11 @@ class BubbleSurvivorsGame {
     }
 
     checkCollisions() {
-        this.projectiles.forEach((projectile, pIndex) => {
-            this.enemies.forEach((enemy, eIndex) => {
-                if (this.isColliding(projectile, enemy)) {
-                    this.projectiles.splice(pIndex, 1);
-                    this.enemies.splice(eIndex, 1);
-                    this.score++;
-                }
-            });
+        this.enemies.forEach((enemy, eIndex) => {
+            if (this.isColliding(this.player, enemy)) {
+                this.enemies.splice(eIndex, 1);
+                this.player.health -= enemy.getDamage();
+            }
         });
     }
 
