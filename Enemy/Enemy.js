@@ -8,6 +8,7 @@ export class Enemy{
         this.speed = speed;
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
+        this.exp = 0;
     }
 
     update(playerX, playerY) {
@@ -16,5 +17,9 @@ export class Enemy{
 
     render(ctx) {
         throw new Error("Method 'render()' must be implemented.");
+    }
+
+    getExp() {
+        return this.exp;
     }
 }
