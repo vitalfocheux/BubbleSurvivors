@@ -96,7 +96,7 @@ class BubbleSurvivorsGame {
         this.enemies.forEach((enemy, index) => {
             enemy.update(this.player.x, this.player.y);
             // Remove enemies out of bounds
-            if (this.isOutOfBounds(enemy)) {
+            if (this.isOutOfBounds(enemy) || enemy.getLife() <= 0) {
                 this.enemies.splice(index, 1);
             }
         });
