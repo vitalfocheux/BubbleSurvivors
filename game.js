@@ -3,6 +3,7 @@ import { Blob_Fish } from './Enemy/Blob_Fish.js';
 import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
 import { Duck } from './Enemy/Duck.js';
+import { Serpang } from './Enemy/Serpang.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -234,6 +235,10 @@ class BubbleSurvivorsGame {
                         case 'Duck':
                             enemy = new Duck(this.canvas);
                             this.enemyCooldown = 160;
+                            break;
+                        case 'Serpang':
+                            enemy = new Serpang(this.canvas);
+                            this.enemyCooldown = 200;
                             break;
                         default:
                             continue;
