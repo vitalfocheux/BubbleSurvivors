@@ -23,6 +23,8 @@ class BubbleSurvivorsGame {
         this.waveNumber = waveNumber;
         this.time = this.waveNumber * TIME_MUL;
         this.isGameRunning = true;
+        this.levelCurrent = 1;
+        this.levelBeforeWave = 1;
 
         setInterval(() => this.updateTime(), 1000);
     }
@@ -106,6 +108,11 @@ class BubbleSurvivorsGame {
 
             for(let enemy of this.enemies){
                 this.player.expNow += enemy.getExp();
+                if(this.player.expNow >= this.player.expMax){
+                    this.levelCurrent++;
+                    this.player.expNow = 0;
+                    this.player.expMax += 50;
+                }
                 this.player.money += enemy.getExp();
             }
 
@@ -113,6 +120,7 @@ class BubbleSurvivorsGame {
             this.render();
             this.waveNumber++;
             this.difficulty++;
+            this.player.health = this.player.healthMax;
             
             console.log(this.waveNumber);
 
@@ -132,6 +140,7 @@ class BubbleSurvivorsGame {
                 this.enemies = [];  // Clear existing enemies
                 this.projectiles = [];  // Clear existing projectiles
                 this.time = this.waveNumber * TIME_MUL;  // Reset timer based on wave number
+                this.levelBeforeWave = this.levelCurrent;
             }
         }
     }
