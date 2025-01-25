@@ -6,19 +6,22 @@ const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 const FPS = 60;
 
+const TIME_MUL = 5;
+
 // Key game classes
 class BubbleSurvivorsGame {
-    constructor(canvas) {
+    constructor(canvas, waveNumber, score, difficulty) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.player = null;
         this.enemies = [];
         this.projectiles = [];
-        this.score = 0;
-        this.difficulty = 1;
+        this.score = score;
+        this.difficulty = difficulty;
         this.initGame();
-        this.waveNumber = 1;
-        this.time = this.waveNumber * 10;
+        this.waveNumber = waveNumber;
+        this.time = this.waveNumber * TIME_MUL;
+        this.isGameRunning = true;
 
         setInterval(() => this.updateTime(), 1000);
     }
@@ -34,10 +37,12 @@ class BubbleSurvivorsGame {
 
     startGameLoop() {
         this.gameLoop = setInterval(() => {
-            this.update();
-            this.render();
-            this.spawnEnemies();
-            this.checkCollisions();
+            if(this.isGameRunning){
+                this.update();
+                this.render();
+                this.spawnEnemies();
+                this.checkCollisions();
+            }
         }, 1000 / FPS);
     }
 
@@ -70,9 +75,36 @@ class BubbleSurvivorsGame {
     updateTime(){
         this.time--;
         if(this.time === 0){
+
+            for(let enemy of this.enemies){
+                this.player.expNow += enemy.getExp();
+                this.player.money += enemy.getExp();
+            }
+
+            this.enemies = [];
+            this.render();
             this.waveNumber++;
-            this.time = this.waveNumber * 10;
             this.difficulty++;
+            
+            console.log(this.waveNumber);
+
+            // Open the modal
+            const modal = document.getElementById('modal');
+            modal.style.display = 'block';
+
+            this.isGameRunning = false;
+
+            // Close the modal when the user clicks on the button
+            const nextWaveButton = document.getElementById('nextWave');
+            nextWaveButton.onclick = () => {
+                modal.style.display = 'none';
+                this.isGameRunning = true;
+
+                // Reset or reinitialize game state for new wave
+                this.enemies = [];  // Clear existing enemies
+                this.projectiles = [];  // Clear existing projectiles
+                this.time = this.waveNumber * TIME_MUL;  // Reset timer based on wave number
+            }
         }
     }
 
@@ -148,6 +180,9 @@ class PlayerBubble {
         };
         this.healthMax = 100;
         this.health = this.healthMax;
+        this.expNow = 0;
+        this.expMax = 100;
+        this.money = 0;
     }
 
     update(canvas) {
@@ -215,16 +250,46 @@ class PlayerBubble {
         ctx.lineWidth = this.radius * 0.1;
         ctx.stroke();
 
+        // Dessiner la barre d'expérience
+        this.renderExperienceBar(ctx);
+
         this.renderHealthBar(ctx);
     
         ctx.restore(); // Restaurer le contexte du canvas
     }
 
+    renderExperienceBar(ctx) {
+        const barWidth = 100;
+        const barHeight = 20;
+        const barX = 10; // Position X en haut à gauche
+        const barY = 30; // Position Y en haut à gauche
+
+        // Dessiner la barre de fond (grise)
+        ctx.fillStyle = 'grey';
+        ctx.fillRect(barX, (barY - 10), barWidth, barHeight);
+
+        // Dessiner la barre d'expérience (verte)
+        const expWidth = (this.expNow / this.expMax) * barWidth;
+        ctx.fillStyle = 'green';
+        ctx.fillRect(barX, (barY - 10), expWidth, barHeight);
+
+        // Dessiner le texte de l'expérience
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${this.expNow} / ${this.expMax} XP`, barX + barWidth / 2, (barY - 10) + barHeight / 2);
+
+        // Dessiner le nombre de money au-dessus de la barre d'expérience
+        ctx.fillText(`Money: ${this.money}`, barX + barWidth / 2, (barY) - barHeight);
+    }
+
+
     renderHealthBar(ctx) {
         const barWidth = 100;
         const barHeight = 20;
         const barX = 10; // Position X en haut à gauche
-        const barY = 10; // Position Y en haut à gauche
+        const barY = 45; // Position Y en haut à gauche
 
         // Dessiner la barre de fond (grise)
         ctx.fillStyle = 'grey';
@@ -290,7 +355,7 @@ document.addEventListener('keyup', (e) => keys[e.code] = false);
 let game;
 function initializeGame() {
     const canvas = document.getElementById('gameCanvas');
-    game = new BubbleSurvivorsGame(canvas);
+    game = new BubbleSurvivorsGame(canvas, 1, 0, 1);
 
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') game.player.shootProjectile();
