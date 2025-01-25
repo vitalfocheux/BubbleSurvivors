@@ -21,7 +21,7 @@ export class Axolotl extends Enemy {
         const numFrames = 13;
         for (let i = 1; i < numFrames; i++) {
             const img = new Image();
-            img.src = `assets/sprites/axolotl/axolotl_albino_${i}.png`;
+            img.src = super.getShiny() ? `assets/sprites/axolotl/axolotl_golden_${i}.png` : `assets/sprites/axolotl/axolotl_albino_${i}.png`;
             img.onerror = () => {
                 console.error(`Failed to load image: ${img.src}`);
             };
