@@ -32,7 +32,8 @@ class BubbleSurvivorsGame {
     initGame() {
         this.player = new PlayerBubble(
             this.canvas.width / 2, 
-            this.canvas.height / 2
+            this.canvas.height / 2,
+            this
         );
         
         this.startGameLoop();
@@ -45,6 +46,7 @@ class BubbleSurvivorsGame {
                 this.render();
                 this.spawnEnemies();
                 this.checkCollisions();
+                this.checkProjectileCollisions();
             }
         }, 1000 / FPS);
     }
@@ -99,6 +101,17 @@ class BubbleSurvivorsGame {
             if (this.isOutOfBounds(enemy) || enemy.getLife() <= 0) {
                 this.enemies.splice(index, 1);
             }
+        });
+    }
+
+    checkProjectileCollisions() {
+        this.projectiles.forEach((projectile, pIndex) => {
+            this.enemies.forEach((enemy, eIndex) => {
+                if (this.isColliding(projectile, enemy)) {
+                    this.projectiles.splice(pIndex, 1);
+                    enemy.life -= 1;
+                }
+            });
         });
     }
 
@@ -197,11 +210,29 @@ class BubbleSurvivorsGame {
         return obj.x < 0 || obj.x > this.canvas.width || 
                obj.y < 0 || obj.y > this.canvas.height;
     }
+
+    findClosestEnemy() {
+        let closestEnemy = null;
+        let closestDistance = Infinity;
+
+        this.enemies.forEach(enemy => {
+            const dx = this.player.x - enemy.x;
+            const dy = this.player.y - enemy.y;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+
+            if(distance < closestDistance) {
+                closestDistance = distance;
+                closestEnemy = enemy;
+            }
+        });
+
+        return closestEnemy;
+    }
 }
 
 class PlayerBubble {
 
-    constructor(x, y) {
+    constructor(x, y, game) {
         this.x = x;
         this.y = y;
         this.radius = 30;
@@ -217,11 +248,17 @@ class PlayerBubble {
         this.expNow = 0;
         this.expMax = 100;
         this.money = 0;
+        this.projectileCooldown = 0;
+        this.game = game;
     }
 
     update(canvas) {
         this.handleMovement(canvas);
         this.projectileCooldown = Math.max(0, this.projectileCooldown - 1);
+
+        if(this.projectileCooldown === 0){
+            this.shootProjectile();
+        }
     }
 
     handleMovement(canvas) {
@@ -344,20 +381,30 @@ class PlayerBubble {
 
     shootProjectile() {
         if (this.projectileCooldown === 0) {
-            const projectile = new Projectile(this.x, this.y);
-            game.projectiles.push(projectile);
-            this.projectileCooldown = 10;
+            const closestEnemy = this.game.findClosestEnemy();
+            if (closestEnemy) {
+                const dx = closestEnemy.x - this.x;
+                const dy = closestEnemy.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const direction = {
+                    x: dx / distance,
+                    y: dy / distance
+                };
+                const projectile = new Projectile(this.x, this.y, direction);
+                this.game.projectiles.push(projectile);
+                this.projectileCooldown = 10;
+            }
         }
     }
 }
 
 class Projectile {
-    constructor(x, y) {
+    constructor(x, y, direction) {
         this.x = x;
         this.y = y;
         this.radius = 5;
         this.speed = 10;
-        this.direction = this.calculateDirection();
+        this.direction = direction;
     }
 
     calculateDirection() {
@@ -375,7 +422,7 @@ class Projectile {
     render(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = 'yellow';
         ctx.fill();
     }
 }
