@@ -4,7 +4,9 @@ import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
 import { Duck } from './Enemy/Duck.js';
 import { Serpang } from './Enemy/Serpang.js';
+import { Wailord } from './Enemy/Wailord.js';
 import { Soap } from './Items/Soap.js';
+import { BubbleBlaster } from './Items/BubbleBlaster.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -13,10 +15,11 @@ const FPS = 60;
 
 const TIME_MUL = 5;
 const HEALTH_BASE = 100;
-const WAVE = 1;
+const WAVE = 30;
 const COOLDOWN_PROJECTILE_BASE = 10;
 const SPEED_PROJECTILE_BASE = 10;
 const COOLDOWN_ENEMY_BASE = 1;
+const DAMAGE_BASE = 1;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -51,23 +54,25 @@ class BubbleSurvivorsGame {
 
     setupModal() {
         this.modal = document.getElementById('modal');
+        this.moneyDisplay = document.getElementById('moneyDisplay');
         this.itemButton1 = document.getElementById('itemButton1');
         this.itemButton2 = document.getElementById('itemButton2');
         this.itemButton3 = document.getElementById('itemButton3');
+        this.updateMoneyDisplay();
 
         this.generateRandomItems();
 
         console.log(this.item1);
 
-        this.itemButton1.addEventListener('click', () => this.buyItem(this.item1));
-        this.itemButton2.addEventListener('click', () => this.buyItem(this.item2));
-        this.itemButton3.addEventListener('click', () => this.buyItem(this.item3));
+        this.itemButton1.addEventListener('click', () => this.buyItem(this.item1, this.itemButton1));
+        this.itemButton2.addEventListener('click', () => this.buyItem(this.item2, this.itemButton2));
+        this.itemButton3.addEventListener('click', () => this.buyItem(this.item3, this.itemButton3));
     }
 
     generateRandomItems() {
         const items = [
             new Soap(),
-            new Soap(),
+            new BubbleBlaster(),
             new Soap()
         ]
 
@@ -75,13 +80,27 @@ class BubbleSurvivorsGame {
         this.item2 = items[Math.floor(Math.random() * items.length)];
         this.item3 = items[Math.floor(Math.random() * items.length)];
 
-        this.itemButton1.textContent = `${this.item1.constructor.name}: ${this.item1.getDescriptor()}`;
-        this.itemButton2.textContent = `${this.item2.constructor.name}: ${this.item2.getDescriptor()}`;
-        this.itemButton3.textContent = `${this.item3.constructor.name}: ${this.item3.getDescriptor()}`;
+        this.itemButton1.textContent = this.DescriptorItem(this.item1);
+        this.itemButton2.textContent = this.DescriptorItem(this.item2);
+        this.itemButton3.textContent = this.DescriptorItem(this.item3);
     }
 
-    buyItem(item) {
-        console.log(item.getIncreaseLife());
+    DescriptorItem(item){
+        return `${item.constructor.name}: ${item.getDescriptor()} - ${item.getCost()}🫧`;
+    }
+
+    buyItem(item, button) {
+        if(this.player.money < item.getCost()) return;
+        this.player.healthMax += item.getIncreaseLife();
+        this.player.health = this.player.healthMax;
+        this.player.weapons.push(item.getIncreaseDamage());
+        this.player.money -= item.getCost();
+        button.style.display = 'none';
+        this.updateMoneyDisplay();
+    }
+
+    updateMoneyDisplay() {
+        this.moneyDisplay.textContent = `Money: ${this.player.money}🫧`
     }
 
 
@@ -166,7 +185,7 @@ class BubbleSurvivorsGame {
             this.enemies.forEach((enemy, eIndex) => {
                 if (this.isColliding(projectile, enemy)) {
                     this.projectiles.splice(pIndex, 1);
-                    enemy.life -= 1;
+                    enemy.life -= DAMAGE_BASE * (1 + this.player.weapons.reduce((a, b) => a + b, 0) / 100);
                 }
             });
         });
@@ -184,16 +203,10 @@ class BubbleSurvivorsGame {
 
     updateTime(){
         this.time--;
+        console.log(`Damage : ${1 + this.player.weapons.reduce((a, b) => a + b, 0) / 100}`);
         if(this.time === 0){
 
             for(let enemy of this.enemies){
-                // this.player.expNow += enemy.getExp();
-                // if(this.player.expNow >= this.player.expMax){
-                //     this.levelCurrent++;
-                //     this.player.expNow = 0;
-                //     this.player.expMax += 50;
-                // }
-                // this.player.money += enemy.getExp();
                 this.updateExp_Money(enemy);
             }
 
@@ -285,6 +298,10 @@ class BubbleSurvivorsGame {
                             enemy = new Serpang(this.canvas);
                             this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
                             break;
+                        case 'Wailord':
+                            enemy = new Wailord(this.canvas);
+                            //this.enemyCooldown = 250 * COOLDOWN_ENEMY_BASE;
+                            break;
                         default:
                             continue;
                     }
@@ -307,7 +324,6 @@ class BubbleSurvivorsGame {
     checkCollisions() {
         this.enemies.forEach((enemy, eIndex) => {
             if (this.isColliding(this.player, enemy)) {
-                this.enemies.splice(eIndex, 1);
                 this.player.health -= enemy.getDamage();
             }
         });
@@ -363,6 +379,7 @@ class PlayerBubble {
         this.money = 0;
         this.projectileCooldown = 0;
         this.game = game;
+        this.weapons = [];
     }
 
     update(canvas) {
