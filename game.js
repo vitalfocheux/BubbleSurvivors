@@ -4,6 +4,7 @@ import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
 import { Duck } from './Enemy/Duck.js';
 import { Serpang } from './Enemy/Serpang.js';
+import { Soap } from './Items/Soap.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -34,7 +35,11 @@ class BubbleSurvivorsGame {
         this.levelCurrent = 1;
         this.levelBeforeWave = 1;
         this.loadEnemiesConfig();
+        // this.setupModal();
         this.enemyCooldown = 0;
+        this.item1;
+        this.item2;
+        this.item3;
 
         setInterval(() => this.updateTime(), 1000);
     }
@@ -43,6 +48,42 @@ class BubbleSurvivorsGame {
         const response = await fetch('Enemies.json');
         this.enemiesConfig = await response.json();
     }
+
+    setupModal() {
+        this.modal = document.getElementById('modal');
+        this.itemButton1 = document.getElementById('itemButton1');
+        this.itemButton2 = document.getElementById('itemButton2');
+        this.itemButton3 = document.getElementById('itemButton3');
+
+        this.generateRandomItems();
+
+        console.log(this.item1);
+
+        this.itemButton1.addEventListener('click', () => this.buyItem(this.item1));
+        this.itemButton2.addEventListener('click', () => this.buyItem(this.item2));
+        this.itemButton3.addEventListener('click', () => this.buyItem(this.item3));
+    }
+
+    generateRandomItems() {
+        const items = [
+            new Soap(),
+            new Soap(),
+            new Soap()
+        ]
+
+        this.item1 = items[Math.floor(Math.random() * items.length)];
+        this.item2 = items[Math.floor(Math.random() * items.length)];
+        this.item3 = items[Math.floor(Math.random() * items.length)];
+
+        this.itemButton1.textContent = `${this.item1.constructor.name}: ${this.item1.getDescriptor()}`;
+        this.itemButton2.textContent = `${this.item2.constructor.name}: ${this.item2.getDescriptor()}`;
+        this.itemButton3.textContent = `${this.item3.constructor.name}: ${this.item3.getDescriptor()}`;
+    }
+
+    buyItem(item) {
+        console.log(item.getIncreaseLife());
+    }
+
 
     initGame() {
         this.player = new PlayerBubble(
@@ -167,6 +208,7 @@ class BubbleSurvivorsGame {
             modal.style.display = 'block';
 
             this.isGameRunning = false;
+            this.setupModal();
 
             // Close the modal when the user clicks on the button
             const nextWaveButton = document.getElementById('nextWave');
