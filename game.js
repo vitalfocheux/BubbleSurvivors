@@ -15,11 +15,12 @@ const FPS = 60;
 
 const TIME_MUL = 5;
 const HEALTH_BASE = 100;
-const WAVE = 30;
+const WAVE = 1;
 const COOLDOWN_PROJECTILE_BASE = 10;
 const SPEED_PROJECTILE_BASE = 10;
 const COOLDOWN_ENEMY_BASE = 1;
 const DAMAGE_BASE = 1;
+const EXP_BASE = 100;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -144,6 +145,12 @@ class BubbleSurvivorsGame {
                 this.isGameRunning = true;
 
                 this.waveNumber = 1;
+                this.difficulty = 1;
+                this.levelCurrent = 1;
+                this.levelBeforeWave = 1;
+                this.player.money = 0;
+                this.player.expNow = 0;
+                this.player.expMax = EXP_BASE;
                 this.player.health = HEALTH_BASE;
                 // Reset or reinitialize game state for new wave
                 this.enemies = [];  // Clear existing enemies
@@ -227,6 +234,9 @@ class BubbleSurvivorsGame {
             const nextWaveButton = document.getElementById('nextWave');
             nextWaveButton.onclick = () => {
                 modal.style.display = 'none';
+                document.getElementById('itemButton1').style.display = 'block';
+                document.getElementById('itemButton2').style.display = 'block';
+                document.getElementById('itemButton3').style.display = 'block';
                 this.isGameRunning = true;
 
                 // Reset or reinitialize game state for new wave
@@ -375,7 +385,7 @@ class PlayerBubble {
         this.healthMax = HEALTH_BASE;
         this.health = this.healthMax;
         this.expNow = 0;
-        this.expMax = 100;
+        this.expMax = EXP_BASE;
         this.money = 0;
         this.projectileCooldown = 0;
         this.game = game;
