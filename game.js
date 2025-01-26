@@ -13,6 +13,9 @@ const FPS = 60;
 const TIME_MUL = 5;
 const HEALTH_BASE = 100;
 const WAVE = 1;
+const COOLDOWN_PROJECTILE_BASE = 10;
+const SPEED_PROJECTILE_BASE = 10;
+const COOLDOWN_ENEMY_BASE = 1;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -222,23 +225,23 @@ class BubbleSurvivorsGame {
                     switch (enemyConfig.name) {
                         case 'Blob_Fish':
                             enemy = new Blob_Fish(this.canvas);
-                            this.enemyCooldown = 50;
+                            this.enemyCooldown = 50 * COOLDOWN_ENEMY_BASE;
                             break;
                         case 'Squid':
                             enemy = new Squid(this.canvas);
-                            this.enemyCooldown = 100;
+                            this.enemyCooldown = 100 * COOLDOWN_ENEMY_BASE;
                             break;
                         case 'Axolotl':
                             enemy = new Axolotl(this.canvas);
-                            this.enemyCooldown = 150;
+                            this.enemyCooldown = 150 * COOLDOWN_ENEMY_BASE;
                             break;
                         case 'Duck':
                             enemy = new Duck(this.canvas);
-                            this.enemyCooldown = 160;
+                            this.enemyCooldown = 160 * COOLDOWN_ENEMY_BASE;
                             break;
                         case 'Serpang':
                             enemy = new Serpang(this.canvas);
-                            this.enemyCooldown = 200;
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
                             break;
                         default:
                             continue;
@@ -458,20 +461,20 @@ class PlayerBubble {
                     x: dx / distance,
                     y: dy / distance
                 };
-                const projectile = new Projectile(this.x, this.y, direction);
+                const projectile = new Projectile(this.x, this.y, direction, SPEED_PROJECTILE_BASE);
                 this.game.projectiles.push(projectile);
-                this.projectileCooldown = 10;
+                this.projectileCooldown = COOLDOWN_PROJECTILE_BASE;
             }
         }
     }
 }
 
 class Projectile {
-    constructor(x, y, direction) {
+    constructor(x, y, direction, speed) {
         this.x = x;
         this.y = y;
         this.radius = 5;
-        this.speed = 10;
+        this.speed = speed;
         this.direction = direction;
     }
 
@@ -493,6 +496,12 @@ class Projectile {
         ctx.fillStyle = 'yellow';
         ctx.fill();
     }
+
+    getSpeed() {
+        return this.speed;
+    }
+
+
 }
 
 // Input handling
