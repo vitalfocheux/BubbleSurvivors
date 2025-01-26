@@ -7,18 +7,22 @@ body {
     text-align: center;
 }
 
+.title-container {
+    margin: 20px 0;
+    padding: 20px;
+    height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
 .game-container {
-    max-width: 800px;
+    max-width: 1040px;
     margin: 0 auto;
     padding: 20px;
     position: relative;
     z-index: -2;
-}
-
-.game-title {
-    font-size: 4rem;
-    color: #ff6b6b;
-    text-shadow: 0 0 15px #ff6b6b;
 }
 
 .game-description {
@@ -109,4 +113,20 @@ body {
 
 .modal-content p, h2 {
     color: black;
+}
+
+.bubble {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 162, 255, 0.7);
+    box-shadow: 0 0 20px rgba(0, 162, 255, 0.5);
+    animation: float 2s infinite ease-in-out;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0); }
 }
