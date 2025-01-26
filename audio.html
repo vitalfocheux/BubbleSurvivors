@@ -1,0 +1,26 @@
+<script>
+    const musiques = [
+        "./assets/music/1_bubble_survivor-menus.ogg",
+        "./assets/music/take the sea.ogg",
+        "./assets/music/free level.ogg",
+        "./assets/music/remember your fight_v1.ogg",
+        "./assets/music/awake - 01 Début.ogg",
+        "./assets/music/just chill.ogg",
+        
+        
+    ];
+
+    const audio = new Audio();
+    // random between 0 and 5
+    let musiqueIndex = Math.floor(Math.random() * musiques.length);
+
+    function jouerProchaineMusique() {
+        if (musiqueIndex >= musiques.length) musiqueIndex = 0;
+        audio.src = musiques[musiqueIndex];
+        audio.play();
+        musiqueIndex++;
+    }
+
+    audio.addEventListener("ended", jouerProchaineMusique);
+    jouerProchaineMusique();
+</script>
