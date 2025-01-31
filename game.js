@@ -65,6 +65,21 @@ class BubbleSurvivorsGame {
 
         console.log(this.item1);
 
+        // Ensure buttons are visible
+        this.itemButton1.style.display = 'inline-block';
+        this.itemButton2.style.display = 'inline-block';
+        this.itemButton3.style.display = 'inline-block';
+
+        //Remove old event listeners
+        this.itemButton1.replaceWith(this.itemButton1.cloneNode(true));
+        this.itemButton2.replaceWith(this.itemButton2.cloneNode(true));
+        this.itemButton3.replaceWith(this.itemButton3.cloneNode(true));
+
+        //Reattach new event listeners
+        this.itemButton1 = document.getElementById('itemButton1');
+        this.itemButton2 = document.getElementById('itemButton2');
+        this.itemButton3 = document.getElementById('itemButton3');
+
         this.itemButton1.addEventListener('click', () => this.buyItem(this.item1, this.itemButton1));
         this.itemButton2.addEventListener('click', () => this.buyItem(this.item2, this.itemButton2));
         this.itemButton3.addEventListener('click', () => this.buyItem(this.item3, this.itemButton3));
@@ -84,6 +99,12 @@ class BubbleSurvivorsGame {
         this.itemButton1.textContent = this.DescriptorItem(this.item1);
         this.itemButton2.textContent = this.DescriptorItem(this.item2);
         this.itemButton3.textContent = this.DescriptorItem(this.item3);
+
+        
+
+        // this.itemButton1.addEventListener('click', () => this.buyItem(this.item1, this.itemButton1));
+        // this.itemButton2.addEventListener('click', () => this.buyItem(this.item2, this.itemButton2));
+        // this.itemButton3.addEventListener('click', () => this.buyItem(this.item3, this.itemButton3));
     }
 
     DescriptorItem(item){
@@ -95,8 +116,10 @@ class BubbleSurvivorsGame {
         this.player.healthMax += item.getIncreaseLife();
         this.player.health = this.player.healthMax;
         this.player.weapons.push(item.getIncreaseDamage());
+        
         this.player.money -= item.getCost();
         button.style.display = 'none';
+        console.log(`Cost: ${item.getCost()}`);
         this.updateMoneyDisplay();
     }
 
@@ -233,11 +256,14 @@ class BubbleSurvivorsGame {
             // Close the modal when the user clicks on the button
             const nextWaveButton = document.getElementById('nextWave');
             nextWaveButton.onclick = () => {
-                modal.style.display = 'none';
+                
                 document.getElementById('itemButton1').style.display = 'block';
                 document.getElementById('itemButton2').style.display = 'block';
                 document.getElementById('itemButton3').style.display = 'block';
+
+                modal.style.display = 'none';
                 this.isGameRunning = true;
+
 
                 // Reset or reinitialize game state for new wave
                 this.enemies = [];  // Clear existing enemies
@@ -386,7 +412,7 @@ class PlayerBubble {
         this.health = this.healthMax;
         this.expNow = 0;
         this.expMax = EXP_BASE;
-        this.money = 0;
+        this.money = 100;
         this.projectileCooldown = 0;
         this.game = game;
         this.weapons = [];
