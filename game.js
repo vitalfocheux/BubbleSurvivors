@@ -99,12 +99,6 @@ class BubbleSurvivorsGame {
         this.itemButton1.textContent = this.DescriptorItem(this.item1);
         this.itemButton2.textContent = this.DescriptorItem(this.item2);
         this.itemButton3.textContent = this.DescriptorItem(this.item3);
-
-        
-
-        // this.itemButton1.addEventListener('click', () => this.buyItem(this.item1, this.itemButton1));
-        // this.itemButton2.addEventListener('click', () => this.buyItem(this.item2, this.itemButton2));
-        // this.itemButton3.addEventListener('click', () => this.buyItem(this.item3, this.itemButton3));
     }
 
     DescriptorItem(item){
@@ -533,7 +527,7 @@ class PlayerBubble {
         ctx.fillRect(barX, barY, barWidth, barHeight);
 
         // Dessiner la barre de vie (rouge)
-        const healthWidth = (this.health / 100) * barWidth;
+        const healthWidth = (this.health / this.healthMax) * barWidth;
         ctx.fillStyle = 'red';
         ctx.fillRect(barX, barY, healthWidth, barHeight);
 
