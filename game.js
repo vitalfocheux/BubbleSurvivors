@@ -1,4 +1,5 @@
 import { Enemy } from './Enemy/Enemy.js';
+// import { Const } from './Const.js';
 import { Blob_Fish } from './Enemy/Blob_Fish.js';
 import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
@@ -7,6 +8,14 @@ import { Serpang } from './Enemy/Serpang.js';
 import { Wailord } from './Enemy/Wailord.js';
 import { Soap } from './Items/Soap.js';
 import { BubbleBlaster } from './Items/BubbleBlaster.js';
+import { Sword_Fish } from './Enemy/Sword_Fish.js';
+import { Shark } from './Enemy/Shark.js';
+import { Neon } from './Enemy/Neon.js';
+import { Saw_Shark } from './Enemy/Saw_Shark.js';
+import { Sea_Angler } from './Enemy/Sea_Angler.js';
+import { CooldownBooster } from './Items/CooldownBooster.js';
+import { MultiExp } from './Items/MultiExp.js';
+import { Boots } from './Items/Boots.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -21,6 +30,7 @@ const SPEED_PROJECTILE_BASE = 10;
 const COOLDOWN_ENEMY_BASE = 1;
 const DAMAGE_BASE = 1;
 const EXP_BASE = 100;
+const MONEY_BASE = 100;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -89,7 +99,9 @@ class BubbleSurvivorsGame {
         const items = [
             new Soap(),
             new BubbleBlaster(),
-            new Soap()
+            new CooldownBooster(),
+            new MultiExp(),
+            new Boots()
         ]
 
         this.item1 = items[Math.floor(Math.random() * items.length)];
@@ -102,18 +114,31 @@ class BubbleSurvivorsGame {
     }
 
     DescriptorItem(item){
-        return `${item.constructor.name}: ${item.getDescriptor()} - ${item.getCost()}🫧`;
+        return `${item.constructor.name}: ${item.getDescriptor()} - ${Math.floor(item.getCost() * (1 + (this.waveNumber - 2) * 0.2))}🫧`;
     }
 
     buyItem(item, button) {
-        if(this.player.money < item.getCost()) return;
+        if(this.player.money < item.getCost() * (1 + (this.waveNumber - 2) * 0.2)) return;
+
         this.player.healthMax += item.getIncreaseLife();
         this.player.health = this.player.healthMax;
         this.player.weapons.push(item.getIncreaseDamage());
+
+        if(item.getDecreaseCooldown() > 0){
+            this.player.CooldownBooster *= item.getDecreaseCooldown() / 100;
+        }
+
+        if(item instanceof MultiExp){
+            this.player.MultiExp *= item.getIncreaseExp();
+        }
+
+        if(item instanceof Boots){
+            this.player.speed *= item.getIncreaseSpeed();
+        }
         
-        this.player.money -= item.getCost();
+        this.player.money -= item.getCost() * (1 + (this.waveNumber - 2) * 0.2);
         button.style.display = 'none';
-        console.log(`Cost: ${item.getCost()}`);
+        console.log(`Cost: ${Math.floor(item.getCost() * (1 + (this.waveNumber - 2) * 0.2))}`);
         this.updateMoneyDisplay();
     }
 
@@ -222,7 +247,7 @@ class BubbleSurvivorsGame {
             this.player.expNow = 0;
             this.player.expMax += 50;
         }
-        this.player.money += enemy.getExp();
+        this.player.money += enemy.getExp() * this.player.MultiExp;
     }
 
     updateTime(){
@@ -255,6 +280,8 @@ class BubbleSurvivorsGame {
                 document.getElementById('itemButton2').style.display = 'block';
                 document.getElementById('itemButton3').style.display = 'block';
 
+
+                this.player.money = Math.floor(this.player.money);
                 modal.style.display = 'none';
                 this.isGameRunning = true;
 
@@ -332,6 +359,26 @@ class BubbleSurvivorsGame {
                             enemy = new Wailord(this.canvas);
                             //this.enemyCooldown = 250 * COOLDOWN_ENEMY_BASE;
                             break;
+                        case 'Sword_Fish':
+                            enemy = new Sword_Fish(this.canvas);
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            break;
+                        case 'Shark':
+                            enemy = new Shark(this.canvas);
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            break;
+                        case 'Neon':
+                            enemy = new Neon(this.canvas);
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            break;
+                        case 'Saw_Shark':
+                            enemy = new Saw_Shark(this.canvas);
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            break;
+                        case 'Sea_Angler':
+                            enemy = new Sea_Angler(this.canvas);
+                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            break;
                         default:
                             continue;
                     }
@@ -406,10 +453,12 @@ class PlayerBubble {
         this.health = this.healthMax;
         this.expNow = 0;
         this.expMax = EXP_BASE;
-        this.money = 100;
+        this.money = MONEY_BASE;
         this.projectileCooldown = 0;
         this.game = game;
         this.weapons = [];
+        this.CooldownBooster = 1;
+        this.MultiExp = 1;
     }
 
     update(canvas) {
@@ -552,7 +601,8 @@ class PlayerBubble {
                 };
                 const projectile = new Projectile(this.x, this.y, direction, SPEED_PROJECTILE_BASE);
                 this.game.projectiles.push(projectile);
-                this.projectileCooldown = COOLDOWN_PROJECTILE_BASE;
+                this.projectileCooldown = COOLDOWN_PROJECTILE_BASE * this.CooldownBooster;
+                console.log(`Cooldown: ${this.projectileCooldown}`);
             }
         }
     }
