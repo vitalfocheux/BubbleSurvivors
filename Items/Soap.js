@@ -2,7 +2,7 @@ import {Item} from './Item.js';
 
 export class Soap extends Item{
     constructor() {
-        super(0, 0, 0, 50, 10);
+        super(0, 0, 0, 50, 0, 10);
     }
 
     getDescriptor(){

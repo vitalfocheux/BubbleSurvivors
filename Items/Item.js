@@ -1,5 +1,5 @@
 export class Item{
-    constructor(increase_speed, increase_exp, increase_damage, increase_life, cost) {
+    constructor(increase_speed, increase_exp, increase_damage, increase_life, decrease_cooldown, cost) {
         if(new.target === Item){
             throw new TypeError("Cannot construct Enemy instances directly");
         }
@@ -7,6 +7,7 @@ export class Item{
         this.increase_exp = increase_exp;
         this.increase_damage = increase_damage;
         this.increase_life = increase_life;
+        this.decrease_cooldown = decrease_cooldown;
         this.cost = cost;
     }
 
@@ -40,6 +41,14 @@ export class Item{
 
     setIncreaseLife(life) {
         this.increase_life = life;
+    }
+
+    getDecreaseCooldown() {
+        return this.decrease_cooldown;
+    }
+
+    setDecreaseCooldown(cooldown) {
+        this.decrease_cooldown = cooldown;
     }
 
     getCost(){
