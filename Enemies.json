@@ -82,7 +82,77 @@
             },
             "spawnRate": {
                 "30-35": 1,
-                "36-40": 0.5
+                "36-39": 0.5
+            }
+        },
+        {
+            "name": "Sword_Fish",
+            "wave": 40,
+            "attributes": {
+                "speed": 1,
+                "exp": 10,
+                "damage": 5,
+                "life": 15
+            },
+            "spawnRate": {
+                "40-45": 1,
+                "46-50": 0.5
+            }
+        },
+        {
+            "name": "Shark",
+            "wave": 50,
+            "attributes": {
+                "speed": 1,
+                "exp": 10,
+                "damage": 5,
+                "life": 15
+            },
+            "spawnRate": {
+                "50-55": 1,
+                "56-60": 0.5
+            }
+        },
+        {
+            "name": "Sea_Angler",
+            "wave": 60,
+            "attributes": {
+                "speed": 1,
+                "exp": 10,
+                "damage": 5,
+                "life": 15
+            },
+            "spawnRate": {
+                "60-65": 1,
+                "66-70": 0.5
+            }
+        },
+        {
+            "name": "Neon",
+            "wave": 70,
+            "attributes": {
+                "speed": 1,
+                "exp": 10,
+                "damage": 5,
+                "life": 15
+            },
+            "spawnRate": {
+                "70-75": 1,
+                "76-80": 0.5
+            }
+        },
+        {
+            "name": "Saw_Shark",
+            "wave": 80,
+            "attributes": {
+                "speed": 1,
+                "exp": 10,
+                "damage": 5,
+                "life": 15
+            },
+            "spawnRate": {
+                "80-85": 1,
+                "86-90": 0.5
             }
         }
     ]
