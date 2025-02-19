@@ -4,7 +4,7 @@ const SCALE_FACTOR = 5;
 
 export class Wailord extends Enemy {
     constructor(canvas){
-        super(canvas, 15, 1, 10, 5, 15); // Call super constructor first
+        super(canvas, 15, 0.5, 100, 25, 500); // Call super constructor first
         if(super.getShiny()){
             super.setExp(20);
             super.setDamage(10);

@@ -2,7 +2,7 @@ import { Enemy } from './Enemy.js';
 
 export class Shark extends Enemy {
     constructor(canvas){
-        super(canvas, 15, 1, 10, 5, 15); // Call super constructor first
+        super(canvas, 15, 1.35, 22, 13, 30); // Call super constructor first
         if(super.getShiny()){
             super.setExp(20);
             super.setDamage(10);

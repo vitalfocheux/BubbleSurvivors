@@ -1,5 +1,4 @@
 import { Enemy } from './Enemy/Enemy.js';
-// import { Const } from './Const.js';
 import { Blob_Fish } from './Enemy/Blob_Fish.js';
 import { Squid } from './Enemy/Squid.js';
 import { Axolotl } from './Enemy/Axolotl.js';
@@ -16,6 +15,7 @@ import { Sea_Angler } from './Enemy/Sea_Angler.js';
 import { CooldownBooster } from './Items/CooldownBooster.js';
 import { MultiExp } from './Items/MultiExp.js';
 import { Boots } from './Items/Boots.js';
+import { BigShot } from './Items/BigShot.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -23,14 +23,14 @@ const CANVAS_HEIGHT = 600;
 const FPS = 60;
 
 const TIME_MUL = 5;
-const HEALTH_BASE = 100;
+const HEALTH_BASE = 10;
 const WAVE = 1;
-const COOLDOWN_PROJECTILE_BASE = 10;
+const COOLDOWN_PROJECTILE_BASE = 100;
 const SPEED_PROJECTILE_BASE = 10;
 const COOLDOWN_ENEMY_BASE = 1;
 const DAMAGE_BASE = 1;
 const EXP_BASE = 100;
-const MONEY_BASE = 100;
+const MONEY_BASE = 0;
 
 // Key game classes
 class BubbleSurvivorsGame {
@@ -97,11 +97,12 @@ class BubbleSurvivorsGame {
 
     generateRandomItems() {
         const items = [
-            new Soap(),
-            new BubbleBlaster(),
-            new CooldownBooster(),
-            new MultiExp(),
-            new Boots()
+            // new Soap(),
+            // new BubbleBlaster(),
+            // new CooldownBooster(),
+            // new MultiExp(),
+            // new Boots(),
+            new BigShot()
         ]
 
         this.item1 = items[Math.floor(Math.random() * items.length)];
@@ -122,17 +123,28 @@ class BubbleSurvivorsGame {
 
         this.player.healthMax += item.getIncreaseLife();
         this.player.health = this.player.healthMax;
-        this.player.weapons.push(item.getIncreaseDamage());
 
-        if(item.getDecreaseCooldown() > 0){
+        // if(item instanceof BigShot){
+        //     this.player.damage *= item.getIncreaseDamage();
+        // }else{
+        //     this.player.weapons.push(item.getIncreaseDamage());
+        // }
+
+        if(item.getIncreaseDamage() > 0){
+            this.player.weapons.push(item.getIncreaseDamage());
+        }
+
+        if(item instanceof BigShot){
+            this.player.CooldownBooster *= item.getDecreaseCooldown();
+        }else if(item.getDecreaseCooldown() > 0){
             this.player.CooldownBooster *= item.getDecreaseCooldown() / 100;
         }
 
-        if(item instanceof MultiExp){
+        if(item.getIncreaseExp() > 0){
             this.player.MultiExp *= item.getIncreaseExp();
         }
 
-        if(item instanceof Boots){
+        if(item.getIncreaseSpeed() > 0 && this.player.speed < 10){
             this.player.speed *= item.getIncreaseSpeed();
         }
         
@@ -194,6 +206,7 @@ class BubbleSurvivorsGame {
                 this.player.expNow = 0;
                 this.player.expMax = EXP_BASE;
                 this.player.health = HEALTH_BASE;
+                this.player.healthMax = HEALTH_BASE;
                 // Reset or reinitialize game state for new wave
                 this.enemies = [];  // Clear existing enemies
                 this.projectiles = [];  // Clear existing projectiles
@@ -252,7 +265,7 @@ class BubbleSurvivorsGame {
 
     updateTime(){
         this.time--;
-        console.log(`Damage : ${1 + this.player.weapons.reduce((a, b) => a + b, 0) / 100}`);
+        console.log(`Damage : ${DAMAGE_BASE*(1 + this.player.weapons.reduce((a, b) => a + b, 0) / 100)}`);
         if(this.time === 0){
 
             for(let enemy of this.enemies){
@@ -351,33 +364,33 @@ class BubbleSurvivorsGame {
                             enemy = new Duck(this.canvas);
                             this.enemyCooldown = 160 * COOLDOWN_ENEMY_BASE;
                             break;
+                        case 'Neon':
+                            enemy = new Neon(this.canvas);
+                            this.enemyCooldown = 150 * COOLDOWN_ENEMY_BASE;
+                            break;
                         case 'Serpang':
                             enemy = new Serpang(this.canvas);
-                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                            this.enemyCooldown = 180 * COOLDOWN_ENEMY_BASE;
                             break;
-                        case 'Wailord':
-                            enemy = new Wailord(this.canvas);
-                            //this.enemyCooldown = 250 * COOLDOWN_ENEMY_BASE;
-                            break;
-                        case 'Sword_Fish':
-                            enemy = new Sword_Fish(this.canvas);
-                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                        case 'Sea_Angler':
+                            enemy = new Sea_Angler(this.canvas);
+                            this.enemyCooldown = 150 * COOLDOWN_ENEMY_BASE;
                             break;
                         case 'Shark':
                             enemy = new Shark(this.canvas);
                             this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
                             break;
-                        case 'Neon':
-                            enemy = new Neon(this.canvas);
+                        case 'Sword_Fish':
+                            enemy = new Sword_Fish(this.canvas);
                             this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
-                            break;
+                            break;                        
                         case 'Saw_Shark':
                             enemy = new Saw_Shark(this.canvas);
                             this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
                             break;
-                        case 'Sea_Angler':
-                            enemy = new Sea_Angler(this.canvas);
-                            this.enemyCooldown = 200 * COOLDOWN_ENEMY_BASE;
+                        case 'Wailord':
+                            enemy = new Wailord(this.canvas);
+                            this.enemyCooldown = 300 * COOLDOWN_ENEMY_BASE;
                             break;
                         default:
                             continue;
@@ -450,7 +463,7 @@ class PlayerBubble {
             frequency: 0.05 + Math.random() * 0.1
         };
         this.healthMax = HEALTH_BASE;
-        this.health = this.healthMax;
+        this.health = HEALTH_BASE;
         this.expNow = 0;
         this.expMax = EXP_BASE;
         this.money = MONEY_BASE;
@@ -599,7 +612,7 @@ class PlayerBubble {
                     x: dx / distance,
                     y: dy / distance
                 };
-                const projectile = new Projectile(this.x, this.y, direction, SPEED_PROJECTILE_BASE);
+                const projectile = new Projectile(this.x, this.y, direction, SPEED_PROJECTILE_BASE, (DAMAGE_BASE * (1 + this.weapons.reduce((a, b) => a + b, 0) / 100)));
                 this.game.projectiles.push(projectile);
                 this.projectileCooldown = COOLDOWN_PROJECTILE_BASE * this.CooldownBooster;
                 console.log(`Cooldown: ${this.projectileCooldown}`);
@@ -609,12 +622,13 @@ class PlayerBubble {
 }
 
 class Projectile {
-    constructor(x, y, direction, speed) {
+    constructor(x, y, direction, speed, damage) {
         this.x = x;
         this.y = y;
         this.radius = 5;
         this.speed = speed;
         this.direction = direction;
+        this.damage = damage;
     }
 
     calculateDirection() {
@@ -632,7 +646,19 @@ class Projectile {
     render(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'yellow';
+        if(this.damage > 0 && this.damage <= 15){
+            ctx.fillStyle = 'darkred';
+        }else if(this.damage > 15 && this.damage <= 30){
+            ctx.fillStyle = 'red';
+        }else if(this.damage > 30 && this.damage <= 45){
+            ctx.fillStyle = 'orange';
+        }else if(this.damage > 45 && this.damage <= 60){
+            ctx.fillStyle = 'yellow';
+        }else if(this.damage > 60 && this.damage <= 90){
+            ctx.fillStyle = 'white';
+        }else if(this.damage > 90){
+            ctx.fillStyle = 'blue';
+        }
         ctx.fill();
     }
 
