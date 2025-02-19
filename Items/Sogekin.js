@@ -1,8 +1,8 @@
 import { Item } from './Item.js';
 
-export class BubbleBlaster extends Item {
+export class Sogekin extends Item {
     constructor() {
-        super(0, 0, 5, 0, 0, 5);
+        super(0, 0, 80, 0, 0, 100);
     }
 
     getDescriptor() {

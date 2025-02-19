@@ -16,6 +16,9 @@ import { CooldownBooster } from './Items/CooldownBooster.js';
 import { MultiExp } from './Items/MultiExp.js';
 import { Boots } from './Items/Boots.js';
 import { BigShot } from './Items/BigShot.js';
+import { Sogekin } from './Items/Sogekin.js';
+import { Flash } from './Items/Flash.js';
+import { One_UP } from './Items/1UP.js';
 
 // Game configuration
 const CANVAS_WIDTH = 800;
@@ -23,7 +26,7 @@ const CANVAS_HEIGHT = 600;
 const FPS = 60;
 
 const TIME_MUL = 5;
-const HEALTH_BASE = 10;
+const HEALTH_BASE = 15;
 const WAVE = 1;
 const COOLDOWN_PROJECTILE_BASE = 100;
 const SPEED_PROJECTILE_BASE = 10;
@@ -97,12 +100,15 @@ class BubbleSurvivorsGame {
 
     generateRandomItems() {
         const items = [
-            // new Soap(),
-            // new BubbleBlaster(),
-            // new CooldownBooster(),
-            // new MultiExp(),
-            // new Boots(),
-            new BigShot()
+            new Soap(),
+            new BubbleBlaster(),
+            new CooldownBooster(),
+            new MultiExp(),
+            new Boots(),
+            new BigShot(),
+            new Sogekin(),
+            new Flash(),
+            new One_UP()
         ]
 
         this.item1 = items[Math.floor(Math.random() * items.length)];
